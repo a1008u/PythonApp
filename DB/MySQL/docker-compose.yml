@@ -1,0 +1,21 @@
+version: '2'
+
+services:
+  db_data:
+    image: busybox
+    volumes:
+    - /var/lib/mysql
+
+  mysql-python:
+    build: .
+    ports:
+      - "3306:3306"
+      - "33060:33060"
+    volumes_from:
+      # busyboxでデータの永続化を行う
+      - db_data
+    environment:
+      - MYSQL_ROOT_PASSWORD=root # rootのパスワード設定
+      - MYSQL_DATABASE=test      # database の作成
+      - MYSQL_USER=sa            # 新規ユーザの作成
+      - MYSQL_PASSWORD=password  # 新規ユーザのパスワード設定

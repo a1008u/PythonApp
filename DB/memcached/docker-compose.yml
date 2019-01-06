@@ -1,0 +1,15 @@
+version: '2'
+
+services:
+  db_data_memcached:
+    image: busybox
+    volumes:
+    - /var/lib/memcached
+
+  memcached-python:
+    build: .
+    ports:
+      - "11211:11211"
+    volumes_from:
+      # busyboxでデータの永続化を行う
+      - db_data_memcached
