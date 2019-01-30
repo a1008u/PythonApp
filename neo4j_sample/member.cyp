@@ -1,5 +1,5 @@
 MERGE(c:company{id:1,name:'インタースペース',category:'ad(asp)'})
-MERGE(ca:systemdev{id:1,name:'システム開発',category:'アフィリエイト開発'})
+MERGE(de:department{id:1,name:'システム開発',category:'アフィリエイト開発'})
 MERGE(c)-[r:company_department]->(ca)
 
 
