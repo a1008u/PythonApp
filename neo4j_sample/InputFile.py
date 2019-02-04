@@ -1,4 +1,4 @@
-def getFileData(fileName: str):
+def getFileData(fileName: str, searchList: list):
     """
     neo4jに登録するファイルからデータを取得する(xlift)
     ----------
@@ -18,7 +18,8 @@ def getFileData(fileName: str):
                 targets: list = target.split('|')
                 for t in targets:
                     key, value = t.split(':')
-                    tempList.append({key: value})
+                    if 'cookie' == key and value in searchList:
+                        tempList.append({key: value})
 
             mainList.append(tempList)
     return mainList
@@ -40,8 +41,30 @@ def getFileDataXlifV3ex(fileName: str):
                 break
 
             for target in targetLine:
-                key, value = target.split(',')
-                if (key != 'dlog.dmp_id' and value != 'dlog.v3ex'):
-                    tempDict: dict = {key: value}
+                xlift, v3ex = target.split(',')
+                if (xlift != 'dlog.dmp_id' and v3ex != 'dlog.v3ex'):
+                    tempDict: dict = {xlift: v3ex}
                     mainList.append(tempDict)
+    return mainList
+
+
+def getFileDataForSearchXlift(fileName: str):
+    """
+    neo4jに登録するファイルからデータを取得する(xlift-v3ex用)
+    ----------
+    :param fileName:
+    :return:
+    """
+    mainList: list = []
+    with open(fileName, 'r') as f:
+        while True:
+            targetLine: list = f.readline().splitlines()
+
+            if not targetLine:
+                break
+
+            for target in targetLine:
+                xlift, v3ex = target.split(',')
+                if (xlift != 'dlog.dmp_id' and v3ex != 'dlog.v3ex'):
+                    mainList.append(xlift)
     return mainList

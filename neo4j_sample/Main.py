@@ -8,10 +8,17 @@ if __name__ == '__main__':
     driver: Driver = GraphDatabase.driver('bolt://localhost:7687')
     with driver.session() as session:
         session.write_transaction(clear.clearDb)
-        mainList: list = inputFile.getFileData('./test.rtf')
-        # session.write_transaction(setData, mainList)
-        session.write_transaction(input_neo4j.setDataXlift, mainList)
 
-        mainList: list = inputFile.getFileDataXlifV3ex('./xlift-v3ex.csv')
-        session.write_transaction(input_neo4j.setDataxRelation, mainList)
+        searchList: list = inputFile.getFileDataForSearchXlift('./xlift-v3ex.csv')
+        xliftList: list = inputFile.getFileData('./test.rtf', searchList)
+        session.write_transaction(input_neo4j.setDataXlift, xliftList)
+
+        xliftV3exList: list = inputFile.getFileDataXlifV3ex('./xlift-v3ex.csv')
+        session.write_transaction(input_neo4j.setDataxRelation, xliftV3exList)
+
+        print(xliftList)
+        print(len(xliftList))
+
+
+
 
