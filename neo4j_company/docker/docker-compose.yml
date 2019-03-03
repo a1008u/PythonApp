@@ -1,0 +1,39 @@
+version: '2'
+
+services:
+
+  neo4j_datavolume:
+    image: busybox
+    volumes:
+    - /data/dbms
+
+  neo4j_core1:
+    image: neo4j
+    ports:
+      - 7473:7473
+      - 7474:7474
+      - 6477:6477
+      - 7687:7687
+    volumes_from:
+      # busyboxでデータの永続化を行う
+      - neo4j_datavolume
+    environment:
+      - NEO4J_AUTH=none
+#      - NEO4J_AUTH=neo4j/changeme
+#      - NEO4J_dbms_mode=CORE
+#      - NEO4J_causalClustering_expectedCoreClusterSize=3
+#      - NEO4J_causalClustering_initialDiscoveryMembers=neo4j_core1:5000
+#      - NEO4J_dbms_connector_http_listen__address=:7474
+#      - NEO4J_dbms_connector_https_listen__address=:6477
+#      - NEO4J_dbms_connector_bolt_listen__address=:7687
+
+  python3:
+    restart: always
+    build: .
+    container_name: 'python3'
+    working_dir: '/app/'
+    tty: true
+    volumes:
+      - ../../:/app
+    links:
+      - neo4j_core1

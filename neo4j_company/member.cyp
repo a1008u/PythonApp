@@ -88,3 +88,71 @@ MATCH(di:division{id:1}),
 CREATE(di)-[:belongs]->(per),
       (di)-[:belongs]->(per2)
 
+
+
+// systemを調査する人を探索
+MATCH (s:system)<-[:調査]-(m:member) return s,m
+
+// こっちだとダメです
+MATCH (s:system)-[:調査]->(m:member) return s,m
+
+// d -> name -> m
+MATCH (s{name:'上本 英'})-[*..1]->(m) with s,m
+MATCH (d)-[]->(s)
+return s,m,d
+
+// departmentを中心に最短ルート2つで表示
+MATCH (d{name:'システム企画開発部'})-[*..2]->(s)
+return s,d
+
+// ------------------------------------------------------------------
+// 同じ結果　
+MATCH p=shortestPath(
+(s:company {name:'interspace'})-[*]-(m:member{name:'上本 英'})
+)
+RETURN p
+
+MATCH (s:company {name:'interspace'})-[*]->(x)-[*]->(m:member{name:'上本 英'})
+RETURN s,x,m
+// ------------------------------------------------------------------
+
+// ------------------------------------------------------------------
+// 同じ結果　
+MATCH (c:company {name:'interspace'})-[*]->(x)-[*]->(m:member{name:'上本 英'})-[:改修対応]->(sys)
+RETURN c,x,m,sys
+
+MATCH (c:company {name:'interspace'})-[*]->(x)-[*]->(m:member{name:'上本 英'}) with c,x,m
+MATCH (m)-[:改修対応]->(sys)
+RETURN c,x,m,sys
+
+// ------------------------------------------------------------------
+
+// ------------------------------------------------------------------
+// 同じ結果　
+MATCH (c:company {name:'interspace'})-[*]->(x)-[*]->(m:member) -[:調査]->(s:system)with c,x,m,s
+MATCH (m)-[:改修対応]->(s)
+RETURN c,x,m,sys
+
+
+MATCH (c:company {name:'interspace'})-[*]->(x)-[*]->(m:member) with c,x,m
+MATCH (m)-[:調査]->(s:system)<-[:改修対応]-(m)
+RETURN c,x,m,s
+// ------------------------------------------------------------------
+
+// ------------------------------------------------------------------
+// isToolsを調査する人
+MATCH (s:system{name:'isTools'})<-[:調査]-(x) return s,x
+
+// isToolsを調査して、改修する人の経路を取得
+MATCH (s:system{name:'isTools'})<-[:調査{system:'isTools'}]-(x)-[:開発依頼]->(m:member) return s,x,m
+
+MATCH (s:system{name:'isTools'})-[r:調査]-(m:member) with s,r,m
+SET r.system='isTools'
+RETURN s,r,m
+
+//
+MATCH (s:system{name:'マーチャント管理画面'})<-[:調査]-(m1:member)
+MATCH (m1)-[:開発依頼]->(m2:member)
+MATCH (m2)-[:改修対応]->(s)
+return s,m1,m2
+// ------------------------------------------------------------------
